@@ -17,12 +17,14 @@
 import { Icon } from '@iconify/react';
 import {
   registerKindIcon,
+  registerMapSource,
   registerRoute,
   registerSidebarEntry,
 } from '@kinvolk/headlamp-plugin/lib';
 import { ResourceDetail } from './components/ResourceDetail';
 import { ResourceList } from './components/ResourceList';
 import { IML_RESOURCES } from './config';
+import { imlMapSource } from './mapView';
 import { detailsRouteName } from './resources';
 
 const SIDEBAR_ROOT = 'iml';
@@ -69,3 +71,5 @@ for (const config of IML_RESOURCES) {
     resourceClass.apiGroupName
   );
 }
+
+registerMapSource(imlMapSource);

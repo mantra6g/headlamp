@@ -5,6 +5,7 @@
  */
 
 import { KubeObject, KubeObjectInterface } from '@kinvolk/headlamp-plugin/lib/k8s/cluster';
+import { LabelSelector } from './labelSelector';
 
 export const CORE_API_VERSION = 'core.loom.io/v1alpha1';
 export const SCHEDULING_API_VERSION = 'scheduling.loom.io/v1alpha1';
@@ -96,7 +97,8 @@ export class ServiceChain extends ImlObject<
   ImlObjectInterface<{
     from?: ApplicationReference;
     to?: ApplicationReference;
-    functions?: { matchLabels?: Record<string, string>; matchExpressions?: any[] }[];
+    /** One label selector per chain stage, matched against NetworkFunction labels. */
+    functions?: LabelSelector[];
   }>
 > {
   static kind = 'ServiceChain';
