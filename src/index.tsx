@@ -14,19 +14,58 @@
  * limitations under the License.
  */
 
-import { registerAppBarAction } from '@kinvolk/headlamp-plugin/lib';
+import { Icon } from '@iconify/react';
+import {
+  registerKindIcon,
+  registerRoute,
+  registerSidebarEntry,
+} from '@kinvolk/headlamp-plugin/lib';
+import { ResourceDetail } from './components/ResourceDetail';
+import { ResourceList } from './components/ResourceList';
+import { IML_RESOURCES } from './config';
+import { detailsRouteName } from './resources';
 
-// Below are some imports you may want to use.
-//   See README.md for links to plugin development documentation.
-// import { Headlamp, K8s, useTranslation } from '@kinvolk/headlamp-plugin/lib';
-// import { SectionBox } from '@kinvolk/headlamp-plugin/lib/CommonComponents';
-// import { K8s } from '@kinvolk/headlamp-plugin/lib/K8s';
-// import { Typography } from '@mui/material';
+const SIDEBAR_ROOT = 'iml';
 
-registerAppBarAction(<span>Hello</span>);
+registerSidebarEntry({
+  parent: null,
+  name: SIDEBAR_ROOT,
+  label: 'IML',
+  url: `/iml/${IML_RESOURCES[0].path}`,
+  icon: 'mdi:lan',
+});
 
-// Example of using i18n (internationalization):
-// function MyComponent() {
-//   const { t } = useTranslation();
-//   return <div>{t('translation_key')}</div>;
-// }
+for (const config of IML_RESOURCES) {
+  const { resourceClass, path, label, icon } = config;
+  const sidebarName = `iml-${path}`;
+
+  registerSidebarEntry({
+    parent: SIDEBAR_ROOT,
+    name: sidebarName,
+    label,
+    url: `/iml/${path}`,
+  });
+
+  registerRoute({
+    path: `/iml/${path}`,
+    sidebar: sidebarName,
+    name: `iml-${path}-list`,
+    exact: true,
+    component: () => <ResourceList config={config} />,
+  });
+
+  registerRoute({
+    path: resourceClass.isNamespaced ? `/iml/${path}/:namespace/:name` : `/iml/${path}/:name`,
+    sidebar: sidebarName,
+    name: detailsRouteName(resourceClass.apiName),
+    exact: true,
+    component: () => <ResourceDetail config={config} />,
+  });
+
+  // Scoped to the API group so IML's "Service" kind doesn't change the core Service icon.
+  registerKindIcon(
+    resourceClass.kind,
+    { icon: <Icon icon={icon} width="70%" height="70%" />, color: 'rgb(50, 108, 229)' },
+    resourceClass.apiGroupName
+  );
+}
